@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const session = require('express-session')
+const otpGenerator = require('otp-generator');
 const { sendMail } = require('./scripts/mail')
 require('dotenv').config()
 
@@ -32,10 +33,9 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User',userSchema)
 
-// app.get('/', (req,res) => {
-//     res.send('Hii')
-// })
-
-// app.post('')
+async function getEmail(roll) {
+    const detail =  await User.findOne({roll:roll})
+    return detail.email
+}
 
 app.listen(port,() => console.log(`Server is running on http://localhost:${port}`))
