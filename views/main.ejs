@@ -56,6 +56,11 @@
             formData.append('shop',shopValue)
             formData.append('amount',price)
             formData.append('studentId',token)
+            hallEl.readOnly = true
+            shopEl.readOnly = true
+            payEl.readOnly = true
+            payBtn.disable = true
+            payBtn.innerHTML = 'Processing...'
             fetch('/pay',{
                 method:'POST',
                 headers: {
@@ -65,8 +70,7 @@
             }).then(response => response.json())
             .then(data => {
                 if (data.status) {
-                    alert('payment done')
-                    location.reload()
+                    alert('payment done for ' + price + ' Ruppess' )
                 } else {
                     alert('error occured')
                 }
@@ -74,6 +78,7 @@
                 console.log(err);
                 alert('payment Failed')
             })
+            location.reload()
         }
 
     </script>
