@@ -51,7 +51,12 @@ const hallSchema = new mongoose.Schema({
         required: true
     },
     price : {
-        type: Number
+        type: Number,
+        validate: {
+            validator: function (value) {
+              return value >= 0;
+            },
+            message: 'Price must be a positive number.'}
     }
 
 })
