@@ -19,6 +19,7 @@ if (app.get('env')==='production'){
 }
 app.use(session(sess))
 app.use(bodyParser.urlencoded({ extended: false }))
+app.set('view engine', 'ejs');
 const port = process.env.PORT || 3000
 
 const dbUrl = "mongodb+srv://admin:"+process.env.DBPASS+"@cluster0.okpzlrj.mongodb.net/?retryWrites=true&w=majority"
@@ -41,6 +42,7 @@ async function getEmail(roll) {
     return detail.email
 }
 
+// Route that will generate OTP
 app.post('/authenticate/generateOTP',async (req,res) => {
     const roll = parseInt(req.body.roll)
     const otp = otpGenerator.generate(6,{specialChars:false,upperCaseAlphabets:false,lowerCaseAlphabets:false})
@@ -56,6 +58,7 @@ app.post('/authenticate/generateOTP',async (req,res) => {
     return
 })
 
+// Route to verify OTP
 app.post('/authenticate',async (req,res) => {
     const roll = parseInt(req.body.roll)
     const otp = req.body.otp
@@ -74,6 +77,10 @@ app.post('/authenticate',async (req,res) => {
         res.json({'authenticated':false})
         return
     }
+})
+
+app.get('/', (req,res) => {
+    res.render('index')
 })
 
 app.listen(port,() => console.log(`Server is running on http://localhost:${port}`))

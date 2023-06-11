@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MessWebApp</title>
+</head>
+<body>
+        <input type="number" style="display: block;" name="roll" id="roll" placeholder="Enter Rollno.">
+        <input type="number" style="display: none;" name="otp" id="otp" placeholder="Enter OTP">
+        <button onclick="generateOTP()" style="display: block;" id="next" type="button">Next</button>
+        <button onclick="checkOtp()" style="display: none;" id="submit" type="button">Submit</button>
+
+    <script>
+        const rollElm = document.querySelector('#roll')
+        const otpElm = document.querySelector('#otp')
+        const nextBtn = document.querySelector('#next')
+        const submitBtn = document.querySelector('#submit')
+        function generateOTP() {
+            const roll = rollElm.value
+            const formData = new URLSearchParams();
+            formData.append('roll',roll );
+            fetch('/authenticate/generateOTP', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    nextBtn.style.display = "none"
+                    submitBtn.style.display = "block"
+                    otpElm.style.display = "block"
+                    rollElm.readOnly = true
+                } else {
+
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function checkOtp() {
+                const roll = rollElm.value
+                const otp = otpElm.value
+                const formData = new URLSearchParams();
+                formData.append('roll',roll)
+                formData.append('otp',otp)
+                fetch('/authenticate',{
+                    method:'POST',
+                    headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.authenticated) {
+                        alert('You are authenticated')
+                    }  else {
+                        alert('You are not authenticated')
+                    }
+                }).catch(err => console.log(err))
+            }
+    </script>
+</body>
+</html>
