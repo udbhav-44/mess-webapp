@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .result{
+            font-weight: bold;
+        }
+        input{
+            width: fit-content;
+        }
+    </style>
+    <title>Dashboard | MessWebApp</title>
+</head>
+<body>
+    <div>
+        <p>Name: <span class="result"><%= name %></span></p>
+        <p>Rollno: <span class="result"><%= roll %></span></p>
+    </div>
+    <p>Your Expense for this month is <span class="result"><%= monthlyExpense %></span></p>
+
+    <select id="hall" >
+        <option disabled selected>Select Hall</option>
+        <option value="13">Hall-13</option>
+        <option value="4">Hall-4</option>
+    </select>
+    <select id="shop">
+        <option disabled selected>Select Shop</option>
+        <option value="1">Juice</option>
+        <option value="2">Extras</option>
+    </select>
+    <input type="number" id="payment" placeholder="Enter Ruppess">
+    <button onclick="payy()" type="button" id="pay">Pay</button>
+
+    <script>
+        const hallEl = document.querySelector('#hall')
+        const shopEl = document.querySelector('#shop')
+        const payEl = document.querySelector('#payment')
+        const payBtn = document.querySelector('#pay')
+        const cookies = document.cookie.split(';')
+        let token = ''
+        cookies.forEach((cookie) => {
+            a = cookie.split('=')
+            if (a[0]==='token'){
+                token = a[1]
+            }
+        })
+
+        function payy(){
+            const hallValue = hallEl.value
+            const shopValue = shopEl.value
+            const price = payEl.value
+            const formData = new URLSearchParams()
+            formData.append('hall',hallValue)
+            formData.append('shop',shopValue)
+            formData.append('amount',price)
+            formData.append('studentId',token)
+            fetch('/pay',{
+                method:'POST',
+                headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded'
+                    },
+                    body: formData
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status) {
+                    alert('payment done')
+                    location.reload()
+                } else {
+                    alert('error occured')
+                }
+            }).catch(err => {
+                console.log(err);
+                alert('payment Failed')
+            })
+        }
+
+    </script>
+</body>
+</html>

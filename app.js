@@ -25,12 +25,75 @@ const userSchema = new mongoose.Schema({
     otp : {data: String,time:Date} 
 })
 
+const hallSchema = new mongoose.Schema({
+    hallShop: {
+        type: String,
+        enum: ['13-1','13-2','4-1','4-2'],
+        required: true
+    },
+    date : {
+        type: Number,
+        enum: [...Array(31)].map((_, index) => index + 1),
+        required: true
+    },
+    month : {
+        type: Number,
+        enum:[0,1,2,3,4,5,6,7,8,9,10,11],
+        required: true
+    },
+    year : {
+        type:Number,
+        required:true,
+        enum:[2023,2024,2025]
+    },
+    id : {
+        type: String,
+        required: true
+    },
+    price : {
+        type: Number
+    }
+
+})
+
 const User = mongoose.model('User',userSchema)
+const Hall = mongoose.model('Hall',hallSchema)
 
 async function getEmail(roll) {
     const detail =  await User.findOne({roll:roll})
     return detail.email
 }
+
+const calculatePriceSumForMonth = async (id, month,year) => {
+    try {
+      const result = await Hall.aggregate([
+        {
+          $match: {
+            id: id,
+            month:month,
+            year:year
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalPrice: { $sum: "$price" }
+          }
+        }
+      ]);
+  
+      if (result.length > 0) {
+        return result[0].totalPrice;
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      console.error("Error calculating price sum for month:", error);
+      throw error;
+    }
+  };
+  
+  
 
 // Route that will generate OTP
 app.post('/authenticate/generateOTP',async (req,res) => {
@@ -43,8 +106,8 @@ app.post('/authenticate/generateOTP',async (req,res) => {
             console.log('OTP Send Successfully')
             await User.findOneAndUpdate({roll:roll},{otp:{data:otp,time:time}}).catch(err => {console.log(err);res.json({'status':false});return})
             res.json({'status':true})
-        }).catch(err => {console.log(err);res.json({'status':'error'})})
-    }).catch(err => {console.log(err);res.json({'status':'error'})})
+        }).catch(err => {console.log(err);res.json({'status':false})})
+    }).catch(err => {console.log(err);res.json({'status':false})})
     return
 })
 
@@ -69,11 +132,29 @@ app.post('/authenticate',async (req,res) => {
     }
 })
 
+// Route to register payments
+app.post('/pay', async (req,res) => {
+    const id = req.body.studentId
+    const hallShop = req.body.hall +'-'+ req.body.shop
+    const amount = req.body.amount
+    const now = new Date()
+    const date = now.getDate()
+    const month = now.getMonth()
+    const year = now.getFullYear()
+    Hall.create({hallShop:hallShop,id:id,date:date,month:month,year:year,price:amount}).then(() => res.json({'status':true})).catch((err) => {console.log(err);res.json({'status':false})})
+})
+
+
+
 app.get('/',async (req,res) => {
     if (req.cookies.token) {
         const id = req.cookies.token
         const user = await User.findById(id)
-        res.send('hello ' + user.name)
+        const currentDate = new Date()
+        const currentMonth = currentDate.getMonth()
+        const currentYear = currentDate.getFullYear()
+        const totalPrice = await calculatePriceSumForMonth(id,currentMonth,currentYear)
+        res.render('main',{name:user.name,roll:user.roll,monthlyExpense:totalPrice})
     } else {
         res.render('index')
     }

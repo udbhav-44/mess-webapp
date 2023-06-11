@@ -1,6 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        *{
+            outline: transparent;
+			box-sizing: border-box;
+		}
+        button:disabled{
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        button{
+            border: 2px solid white;
+            background-color: #3498DB;
+			color: #fff;
+			line-height: 25px;
+            width: 25%;
+            font-size: 16px;
+            border-radius: 48px;
+            padding: 8px 0;
+			cursor: pointer;
+        }
+        body{
+			background-color: #3498DB;
+			font-family: "Arial", sans-serif;
+			padding: 50px;
+		}
+        input{
+			padding: 12px 0;
+			margin-bottom: 10px;
+			border-radius: 48px;
+			border: 2px solid transparent;
+			text-align: center;
+			width: 25%;
+			font-size: 16px;
+			transition: border .2s, background-color .2s;
+		}
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | MessWebApp</title>
@@ -19,7 +55,7 @@
         function generateOTP() {
             const roll = rollElm.value
             nextBtn.disabled = true
-            nextBtn.innerHTML = 'Loading'
+            nextBtn.innerHTML = 'Loading...'
             const formData = new URLSearchParams();
             formData.append('roll',roll );
             fetch('/authenticate/generateOTP', {
@@ -38,6 +74,7 @@
                     rollElm.readOnly = true
                 } else {
                     nextBtn.disabled = false
+                    console.log('Error occured');
                 }
             })
             .catch(error => {
@@ -60,8 +97,9 @@
                 }).then(response => response.json())
                 .then(data => {
                     if (data.authenticated) {
-                        alert('You are authenticated')
                         setCookie('token',data.id,30)
+                        setCookie('roll',roll,30)
+                        location.reload()
                     }  else {
                         alert('You are not authenticated')
                     }
