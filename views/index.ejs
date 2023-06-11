@@ -18,6 +18,8 @@
         const submitBtn = document.querySelector('#submit')
         function generateOTP() {
             const roll = rollElm.value
+            nextBtn.disabled = true
+            nextBtn.innerHTML = 'Loading'
             const formData = new URLSearchParams();
             formData.append('roll',roll );
             fetch('/authenticate/generateOTP', {
@@ -35,7 +37,7 @@
                     otpElm.style.display = "block"
                     rollElm.readOnly = true
                 } else {
-
+                    nextBtn.disabled = false
                 }
             })
             .catch(error => {
@@ -59,11 +61,19 @@
                 .then(data => {
                     if (data.authenticated) {
                         alert('You are authenticated')
+                        setCookie('token',data.id,30)
                     }  else {
                         alert('You are not authenticated')
                     }
                 }).catch(err => console.log(err))
-            }
+        }
+        function setCookie(name, value, expirationDays) {
+        const date = new Date();
+        date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
     </script>
 </body>
 </html>

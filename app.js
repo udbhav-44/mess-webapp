@@ -1,24 +1,14 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const session = require('express-session')
+const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const otpGenerator = require('otp-generator');
+const otpGenerator = require('otp-generator')
 const { sendMail } = require('./scripts/mail')
 require('dotenv').config()
 
 const app = express()
-var sess = {
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false,maxAge:30*24*60*60*1000 }
-  }
-if (app.get('env')==='production'){
-    app.set('trust proxy',1)
-    sess.cookie.secure = true
-}
-app.use(session(sess))
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser());
 app.set('view engine', 'ejs');
 const port = process.env.PORT || 3000
 
@@ -70,7 +60,7 @@ app.post('/authenticate',async (req,res) => {
     const timeDiff = (time - otpSent.time)/(1000*60)
 
     if (otp===otpSent.data && timeDiff <= 3) {
-        res.json({'authenticated':true})
+        res.json({'authenticated':true,'id':student._id.toString()})
         return
     }
     else {
@@ -79,8 +69,14 @@ app.post('/authenticate',async (req,res) => {
     }
 })
 
-app.get('/', (req,res) => {
-    res.render('index')
+app.get('/',async (req,res) => {
+    if (req.cookies.token) {
+        const id = req.cookies.token
+        const user = await User.findById(id)
+        res.send('hello ' + user.name)
+    } else {
+        res.render('index')
+    }
 })
 
 app.listen(port,() => console.log(`Server is running on http://localhost:${port}`))
