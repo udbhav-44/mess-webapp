@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mess Extras and Juice Shop</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    header {
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 20px;
+    }
+    nav {
+      background-color: #343a40;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+    footer {
+      background-color: #343a40;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+    }
+
+    .item input {
+      width: 40px;
+      padding: 5px;
+    }
+
+    .item button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .item button:hover {
+      background-color: #45a049;
+    }
+
+    .total {
+      text-align: right;
+      margin-top: 20px;
+    }
+    .cart {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mess Extras and Juice Shop</h1>
+  </header>
+  <nav>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/index.html">Home</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/menu2.0.html">Menu</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/extras.html">Extras</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/cart.html">Cart</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/expense.html">Expense Tracker</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/Grienaces.html">Grievance</a>
+  </nav>
+  <main>
+    <div class="item">
+      <span class="name">Extra 1</span>
+      <span class="price">$2.00</span>
+      <input class="quantity" type="number" min="1" value="0">
+      <button class="add-button">Add to Cart</button>
+    </div>
+    <div class="item">
+        <span class="name">Extra 2</span>
+        <span class="price">$3.00</span>
+        <input class="quantity" type="number" min="1" value="0">
+        <button class="add-button">Add to Cart</button>
+    </div>
+    <div class="item">
+        <span class="name">Extra 3</span>
+        <span class="price">$4.00</span>
+        <input class="quantity" type="number" min="1" value="0">
+        <button class="add-button">Add to Cart</button>
+    </div>
+    <!-- more items here -->
+    <div class="total">
+      <h2>Total: <span id="total-price">$0.00</span></h2>
+    </div>
+    <div class="cart">
+      <h2>Your Cart</h2>
+      <div id="cart-items">
+        <!-- items will be added dynamically here -->
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2023 Hostel Mess Management</p>
+  </footer>
+  <script>
+    // parse the price string to get the actual number
+    function parsePrice(priceString) {
+      return Number(priceString.replace(/[^0-9.-]+/g,""));
+    }
+
+    // update the total price display
+    function updateTotalPrice(price) {
+      document.getElementById('total-price').innerText = `$${price.toFixed(2)}`;
+    }
+
+    // handle click event of the add button
+    document.querySelectorAll('.add-button').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        const itemElement = event.target.parentElement;
+        const name = itemElement.querySelector('.name').innerText;
+        const price = parsePrice(itemElement.querySelector('.price').innerText);
+        const quantity = itemElement.querySelector('.quantity').value;
+
+        // add the item to the cart
+        const cartItem = document.createElement('div');
+        cartItem.innerHTML = `<span>${name} x${quantity} - $${(price * quantity).toFixed(2)}</span>`;
+        document.getElementById('cart-items').appendChild(cartItem);
+
+        // update the total price
+        const currentTotalPrice = parsePrice(document.getElementById('total-price').innerText);
+        updateTotalPrice(currentTotalPrice + price * quantity);
+      });
+    });
+  </script>
+</body>
+</html>

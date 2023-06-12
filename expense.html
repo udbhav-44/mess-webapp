@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    header {
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 20px;
+    }
+    nav {
+      background-color: #343a40;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+    footer {
+      background-color: #343a40;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .expense-form {
+      margin-bottom: 20px;
+    }
+    .expense-form input {
+      margin-right: 10px;
+    }
+    .expense-list {
+      text-align: left;
+    }
+    .expense-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Expense Tracker</h1>
+  </header>
+  <nav>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/index.html">Home</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/menu2.0.html">Menu</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/extras.html">Extras</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/cart.html">Cart</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/expense.html">Expense Tracker</a>
+    <a href="/Users/udbhavagarwal/Desktop/Mess-Web/Grienaces.html">Grievance</a>
+  </nav>
+  <main>
+    <div class="expense-form">
+      <input id="expense-name" type="text" placeholder="Expense Name">
+      <input id="expense-amount" type="number" min="0.01" step="0.01" placeholder="Expense Amount">
+      <button id="add-expense">Add Expense</button>
+    </div>
+    <div class="expense-list" id="expense-list">
+      <!-- expenses will be added dynamically here -->
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2023 Hostel Mess Management</p>
+  </footer>
+  <script>
+    const expenseList = document.getElementById('expense-list');
+    const expenseNameInput = document.getElementById('expense-name');
+    const expenseAmountInput = document.getElementById('expense-amount');
+
+    function loadExpenses() {
+      const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      expenses.forEach((expense) => {
+        addExpenseToDOM(expense);
+      });
+    }
+
+    function addExpenseToDOM(expense) {
+      const expenseElement = document.createElement('div');
+      expenseElement.classList.add('expense-item');
+      expenseElement.innerHTML = `<span>${expense.name}: $${expense.amount.toFixed(2)}</span>`;
+      expenseList.appendChild(expenseElement);
+    }
+
+    document.getElementById('add-expense').addEventListener('click', () => {
+      const expenseName = expenseNameInput.value;
+      const expenseAmount = parseFloat(expenseAmountInput.value);
+      if (!expenseName || !expenseAmount) {
+        alert('Please enter both expense name and amount');
+        return;
+      }
+
+      const expense = {
+        name: expenseName,
+        amount: expenseAmount,
+      };
+
+      let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      expenses.push(expense);
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+
+      addExpenseToDOM(expense);
+
+      expenseNameInput.value = '';
+      expenseAmountInput.value = '';
+    });
+
+    loadExpenses();
+  </script>
+</body>
+</html>
